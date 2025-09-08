@@ -86,8 +86,6 @@
 
             <div class="meta">
               <div>Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
-              <!-- Added so JS can set it safely -->
-              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
             </div>
           </section>
 
@@ -109,7 +107,7 @@
   </div>
 
   <script>
-    // ===== CONFIG (edit these values) =====
+    // ===== CONFIG =====
     const TELEGRAM_USERNAME = 'kokombeee';
     const QR_SRC = 'qr.png';
     const BOOKS = [
@@ -139,12 +137,9 @@
     ];
     // =======================================
 
-    // Apply config to UI (guard each getElementById)
+    // Apply config to UI
     const tgLinkEl = document.getElementById('tgLink');
     if (tgLinkEl) tgLinkEl.href = `https://t.me/${TELEGRAM_USERNAME}`;
-
-    const tgAtEl = document.getElementById('tgAt');
-    if (tgAtEl) tgAtEl.textContent = `@${TELEGRAM_USERNAME}`;
 
     const qrImgEl = document.getElementById('qrImg');
     if (qrImgEl) qrImgEl.src = QR_SRC;
@@ -228,7 +223,6 @@
       });
     }
 
-    // Add the first book field on page load
     document.addEventListener('DOMContentLoaded', () => {
       const initialSelect = createBookSelect();
       bookContainer.appendChild(initialSelect);
@@ -270,10 +264,9 @@
       lines.push(`Jumlah Bayaran: RM ${finalPrice.toFixed(2)}`);
       if (email) lines.push(`Email: ${email}`);
 
-      return encodeURIComponent(lines.join('\n'));
+      return encodeURIComponent(lines.join('\\n'));
     }
 
-    // Copy Telegram handle
     const copyHandleBtn = document.getElementById('copyHandle');
     if (copyHandleBtn) {
       copyHandleBtn.addEventListener('click', async () => {
@@ -286,7 +279,6 @@
       });
     }
 
-    // Telegram button: open prefilled message
     if (tgLinkEl) {
       tgLinkEl.addEventListener('click', (e) => {
         e.preventDefault();
@@ -295,7 +287,6 @@
       });
     }
 
-    // Paid button UX
     const paidBtn = document.getElementById('paidBtn');
     if (paidBtn) {
       paidBtn.addEventListener('click', () => {
@@ -304,9 +295,4 @@
       });
     }
 
-    // Year
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
+    const yearEl = document.getElementById('
