@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>E‑book Purchase • QR Pay + Telegram</title>
-  <meta name="description" content="Pay via QR then message me on Telegram to receive the e‑book." />
+  <title>E-book Purchase • QR Pay + Telegram</title>
+  <meta name="description" content="Pay via QR then message me on Telegram to receive the e-book." />
   <style>
     :root{--bg:#0b0f14;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa;--ok:#34d399;--warn:#f59e0b;}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:radial-gradient(1200px 600px at 100% -10%,#1f2937 0%,#0b0f14 60%);color:var(--text);}
     .wrap{max-width:760px;margin:0 auto;padding:24px;}
-    .card{background:linear-gradient(180deg,#0f172a, #0b1020 50%, #0b0f14);border:1px solid #1f2937;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+    .card{background:linear-gradient(180deg,#0f172a,#0b1020 50%,#0b0f14);border:1px solid #1f2937;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
     header{padding:22px 22px 10px;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:14px}
     .logo{width:44px;height:44px;border-radius:12px;background:#0ea5e9;display:grid;place-items:center;font-weight:700}
-    .logo span{filter:drop-shadow(0 2px 6px(0,0,0,.4));}
+    .logo span{filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
     h1{font-size:20px;margin:0}
     .sub{color:var(--muted);font-size:14px;margin-top:2px}
     .body{padding:22px;display:grid;gap:20px}
@@ -63,33 +63,35 @@
         <div class="grid">
           <section class="panel">
             <div class="total-price">Total: RM <span id="totalPrice">0.00</span></div>
-            <div id="discountInfo" style="margin-top: -5px; margin-bottom: 5px;"></div>
+            <div id="discountInfo" style="margin-top:-5px;margin-bottom:5px;"></div>
             <p class="note">Sila pilih tajuk ebooks dan masukkan email address untuk menerima link gdrive.</p>
-            
-            <div id="book-selection-container">
-              <!-- Book selection fields will be added here dynamically -->
-            </div>
+
+            <div id="book-selection-container"></div>
             <button id="addBookBtn" class="btn">+ tambah lagi e-books</button>
-            
+
             <input type="email" id="email" placeholder="Your Email Address" required />
             <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
+
             <div class="steps">
               <div class="step"><div class="badge">1</div><div>Open your banking app and choose <strong>QR Pay</strong>.</div></div>
               <div class="step"><div class="badge">2</div><div>Scan the QR code on the right and pay the exact amount.</div></div>
               <div class="step"><div class="badge">3</div><div>Click <strong>Message on Telegram</strong> and send your receipt. You’ll receive the ebooks shortly.</div></div>
             </div>
+
             <div class="btns">
               <a id="tgLink" class="btn primary" href="https://t.me/kokombeee" target="_blank" rel="noopener">Message on Telegram</a>
               <button class="btn" id="copyHandle" type="button">Copy Telegram @</button>
               <button class="btn success" id="paidBtn" type="button">I’ve Paid</button>
             </div>
+
             <div class="meta">
               <div>Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
+              <!-- Added so JS can set it safely -->
+              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
             </div>
           </section>
 
           <aside class="panel qr">
-            <!-- Replace src with your actual QR image URL or filename (qr.png) -->
             <img id="qrImg" src="qr.png" alt="Payment QR Code" />
             <div class="note" style="text-align:center;margin-top:8px">If the QR doesn't load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
           </aside>
@@ -100,7 +102,7 @@
         <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
         <div style="margin-top:6px">
           <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap e-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
-          <div style="margin-top:6px">By paying you agree to the no‑refund policy for digital goods. © <span id="year"></span></div>
+          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. © <span id="year"></span></div>
         </div>
       </footer>
     </div>
@@ -137,11 +139,18 @@
     ];
     // =======================================
 
-    // Apply config to UI
-    document.getElementById('tgLink').href = `https://t.me/${TELEGRAM_USERNAME}`;
-    document.getElementById('tgAt').textContent = `@${TELEGRAM_USERNAME}`;
-    document.getElementById('qrImg').src = QR_SRC;
-    document.getElementById('qrOpen').addEventListener('click', (e) => {
+    // Apply config to UI (guard each getElementById)
+    const tgLinkEl = document.getElementById('tgLink');
+    if (tgLinkEl) tgLinkEl.href = `https://t.me/${TELEGRAM_USERNAME}`;
+
+    const tgAtEl = document.getElementById('tgAt');
+    if (tgAtEl) tgAtEl.textContent = `@${TELEGRAM_USERNAME}`;
+
+    const qrImgEl = document.getElementById('qrImg');
+    if (qrImgEl) qrImgEl.src = QR_SRC;
+
+    const qrOpenEl = document.getElementById('qrOpen');
+    if (qrOpenEl) qrOpenEl.addEventListener('click', (e) => {
       e.preventDefault();
       window.open(QR_SRC, '_blank', 'noopener');
     });
@@ -154,7 +163,7 @@
       const select = document.createElement('select');
       select.required = true;
       select.style.marginTop = '10px';
-      
+
       const defaultOption = document.createElement('option');
       defaultOption.value = '';
       defaultOption.textContent = 'Pilih e-books anda';
@@ -166,7 +175,7 @@
       ebooksGroup.label = 'e-books';
       const ekomikGroup = document.createElement('optgroup');
       ekomikGroup.label = 'E-komik';
-      
+
       BOOKS.forEach(book => {
         const option = document.createElement('option');
         option.value = book.value;
@@ -178,10 +187,9 @@
           ekomikGroup.appendChild(option);
         }
       });
-      
+
       select.appendChild(ebooksGroup);
       select.appendChild(ekomikGroup);
-      
       return select;
     }
 
@@ -198,24 +206,28 @@
       });
 
       let finalPrice = total;
-      discountInfo.innerHTML = ''; // Clear previous message
+      if (discountInfo) discountInfo.innerHTML = '';
 
       if (bookCount >= 3) {
         const discount = total * 0.05;
         finalPrice = total - discount;
-        discountInfo.innerHTML = `<span style="color:var(--ok); font-size:12px;">Diskaun 5% (${discount.toFixed(2)}) diterima.</span>`;
+        if (discountInfo) discountInfo.innerHTML =
+          `<span style="color:var(--ok);font-size:12px;">Diskaun 5% (RM ${discount.toFixed(2)}) diterima.</span>`;
       }
-      
-      totalPriceElement.textContent = finalPrice.toFixed(2);
+
+      if (totalPriceElement) totalPriceElement.textContent = finalPrice.toFixed(2);
     }
 
-    document.getElementById('addBookBtn').addEventListener('click', () => {
-      const newSelect = createBookSelect();
-      bookContainer.appendChild(newSelect);
-      newSelect.addEventListener('change', calculateTotal);
-      calculateTotal();
-    });
-    
+    const addBookBtn = document.getElementById('addBookBtn');
+    if (addBookBtn) {
+      addBookBtn.addEventListener('click', () => {
+        const newSelect = createBookSelect();
+        bookContainer.appendChild(newSelect);
+        newSelect.addEventListener('change', calculateTotal);
+        calculateTotal();
+      });
+    }
+
     // Add the first book field on page load
     document.addEventListener('DOMContentLoaded', () => {
       const initialSelect = createBookSelect();
@@ -224,7 +236,7 @@
     });
 
     function composeMessage() {
-      const email = document.getElementById('email').value;
+      const email = (document.getElementById('email')?.value || '').trim();
       const allSelects = bookContainer.querySelectorAll('select');
       const selectedBooks = [];
       allSelects.forEach(select => {
@@ -241,8 +253,8 @@
       if (selectedBooks.length >= 3) {
         finalPrice = total * 0.95;
       }
-      
-      let lines = [
+
+      const lines = [
         'Hi! I just paid for some ebooks.',
         'Here are the details:',
         ''
@@ -252,42 +264,49 @@
       });
       lines.push('');
       if (selectedBooks.length >= 3) {
-        lines.push(`Diskaun: 5%`);
+        lines.push('Diskaun: 5%');
         lines.push(`Jumlah Asal: RM ${total.toFixed(2)}`);
       }
       lines.push(`Jumlah Bayaran: RM ${finalPrice.toFixed(2)}`);
-      lines.push(`Email: ${email}`);
+      if (email) lines.push(`Email: ${email}`);
 
       return encodeURIComponent(lines.join('\n'));
     }
 
     // Copy Telegram handle
-    document.getElementById('copyHandle').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME);
-        // Replace alert() with a custom modal or message.
-        // For demonstration, a simple prompt is used here.
-        prompt('Telegram handle copied to clipboard. Paste it into your Telegram chat.', '@' + TELEGRAM_USERNAME);
-      } catch {
-        prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME);
-      }
-    });
+    const copyHandleBtn = document.getElementById('copyHandle');
+    if (copyHandleBtn) {
+      copyHandleBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME);
+          alert('Telegram handle copied to clipboard.');
+        } catch {
+          prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME);
+        }
+      });
+    }
 
     // Telegram button: open prefilled message
-    document.getElementById('tgLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      const msg = composeMessage();
-      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
-    });
+    if (tgLinkEl) {
+      tgLinkEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        const msg = composeMessage();
+        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+      });
+    }
 
     // Paid button UX
-    document.getElementById('paidBtn').addEventListener('click', () => {
-      const msg = composeMessage();
-      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
-    });
+    const paidBtn = document.getElementById('paidBtn');
+    if (paidBtn) {
+      paidBtn.addEventListener('click', () => {
+        const msg = composeMessage();
+        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+      });
+    }
 
     // Year
-    document.getElementById('year').textContent = new Date().getFullYear();
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
