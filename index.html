@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>E-book Purchase • QR Pay + Telegram</title>
+  <title>E-book Purchase â€¢ QR Pay + Telegram</title>
   <meta name="description" content="Pay via QR then message me on Telegram to receive the e-book." />
   <style>
     :root{--bg:#0b0f14;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa;--ok:#34d399;--warn:#f59e0b;}
@@ -52,7 +52,7 @@
   <div class="wrap">
     <div class="card">
       <header>
-        <div class="logo"><span>📚</span></div>
+        <div class="logo"><span>ðŸ“š</span></div>
         <div>
           <h1 id="title">Pembayaran Online: <span data-editable="true">ebooks & e-komik</span></h1>
           <div class="sub">Instant delivery via Google Drive after payment confirmation (ePub @ PDF)</div>
@@ -75,25 +75,34 @@
             <div class="steps">
               <div class="step"><div class="badge">1</div><div>Open your banking app and choose <strong>QR Pay</strong>.</div></div>
               <div class="step"><div class="badge">2</div><div>Scan the QR code on the right and pay the exact amount.</div></div>
-              <div class="step"><div class="badge">3</div><div>Click <strong>Message on Telegram</strong> and send your receipt. You’ll receive the ebooks shortly.</div></div>
+              <div class="step"><div class="badge">3</div><div>Click <strong>Message on Telegram</strong> and send your receipt. Youâ€™ll receive the ebooks shortly.</div></div>
             </div>
 
             <div class="btns">
               <a id="tgLink" class="btn primary" href="https://t.me/kokombeee" target="_blank" rel="noopener">Message on Telegram</a>
               <button class="btn" id="copyHandle" type="button">Copy Telegram @</button>
-              <button class="btn success" id="paidBtn" type="button">I’ve Paid</button>
+              <button class="btn success" id="paidBtn" type="button">Iâ€™ve Paid</button>
             </div>
 
             <div class="meta">
               <div>Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
               <!-- Added so JS can set it safely -->
-              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
             </div>
           </section>
 
           <aside class="panel qr">
             <img id="qrImg" src="qr.png" alt="Payment QR Code" />
             <div class="note" style="text-align:center;margin-top:8px">If the QR doesn't load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
+              <!-- Alternative Payment Option -->
+            <div style="margin-top:14px; text-align:center;">
+  <a class="btn success"
+     href="https://buy.stripe.com/cNi28rfiWdkR1fn7hj57W0v"
+     target="_blank" rel="noopener"
+     style="display:inline-block; min-width:250px;">
+    Payment via Card / GrabPay
+  </a>
+  <div class="note" style="margin-top:6px;">Powered by Stripe | Google Pay</div>
+</div>
           </aside>
         </div>
       </div>
@@ -102,7 +111,7 @@
         <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
         <div style="margin-top:6px">
           <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap e-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
-          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. © <span id="year"></span></div>
+          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. Â© <span id="year"></span></div>
         </div>
       </footer>
     </div>
@@ -255,8 +264,8 @@
       }
 
       const lines = [
-        'Hi! I just paid for some ebooks.',
-        'Here are the details:',
+        'Hi! Saya dah buat pembayaran untuk ebooks.',
+        'Details pembelian:',
         ''
       ];
       selectedBooks.forEach(book => {
