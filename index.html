@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-book Purchase • QR Pay + Telegram</title>
-  <meta name="description" content="Pay via QR or Stripe, then message me on Telegram to receive the e-book." />
+  <meta name="description" content="Pay via QR then message me on Telegram to receive the e-book." />
   <style>
     :root{--bg:#0b0f14;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa;--ok:#34d399;--warn:#f59e0b;}
     *{box-sizing:border-box}
@@ -31,18 +31,20 @@
       color: var(--text);
       margin-top: 10px;
     }
+    .total-price{font-size:20px;font-weight:800;margin-top:10px}
     .steps{display:grid;gap:10px;margin:10px 0 0}
     .step{display:flex;gap:10px;align-items:flex-start}
     .badge{font-variant-numeric:tabular-nums;min-width:26px;height:26px;border-radius:8px;background:#111827;border:1px solid #1f2937;display:grid;place-items:center;color:var(--accent);font-weight:700}
     .qr{display:grid;place-items:center;padding:10px}
     .qr img{width:100%;max-width:300px;border-radius:12px;border:1px solid #1f2937;background:#fff}
     .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-    .btn{appearance:none;border:1px solid #1f2937;background:#0b1224;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer;text-align:center}
+    .btn{appearance:none;border:1px solid #1f2937;background:#0b1224;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
     .btn:hover{filter:brightness(1.1)}
     .btn.primary{background:linear-gradient(180deg,#2563eb,#1d4ed8);border-color:#1e40af}
     .btn.success{background:linear-gradient(180deg,#10b981,#059669);border-color:#047857}
-    .meta{margin-top:6px;color:var(--muted);font-size:13px}
+    .meta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:13px}
     footer{padding:14px 22px 22px;color:var(--muted);font-size:12px}
+    code{background:#0b1224;padding:2px 6px;border-radius:6px;border:1px solid #1f2937}
     a{color:var(--accent);text-decoration:none}
   </style>
 </head>
@@ -60,15 +62,20 @@
       <div class="body">
         <div class="grid">
           <section class="panel">
-            <div class="price">RM <span id="price">10</span></div>
-            <p class="note">Masukkan email anda, bayar, kemudian hubungi saya di Telegram untuk dapatkan link.</p>
+            <div class="total-price">Total: RM <span id="totalPrice">0.00</span></div>
+            <div id="discountInfo" style="margin-top:-5px;margin-bottom:5px;"></div>
+            <p class="note">Sila pilih tajuk ebooks dan masukkan email address untuk menerima link gdrive.</p>
+
+            <div id="book-selection-container"></div>
+            <button id="addBookBtn" class="btn">+ tambah lagi e-books</button>
 
             <input type="email" id="email" placeholder="Your Email Address" required />
+            <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
 
             <div class="steps">
-              <div class="step"><div class="badge">1</div><div>Buka app bank anda dan pilih <strong>QR Pay</strong>.</div></div>
-              <div class="step"><div class="badge">2</div><div>Scan QR di sebelah kanan dan bayar jumlah tepat.</div></div>
-              <div class="step"><div class="badge">3</div><div>Klik <strong>Message on Telegram</strong> dan hantar resit anda.</div></div>
+              <div class="step"><div class="badge">1</div><div>Open your banking app and choose <strong>QR Pay</strong>.</div></div>
+              <div class="step"><div class="badge">2</div><div>Scan the QR code on the right and pay the exact amount.</div></div>
+              <div class="step"><div class="badge">3</div><div>Click <strong>Message on Telegram</strong> and send your receipt. You’ll receive the ebooks shortly.</div></div>
             </div>
 
             <div class="btns">
@@ -77,72 +84,229 @@
               <button class="btn success" id="paidBtn" type="button">I’ve Paid</button>
             </div>
 
-            <div class="meta">Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
+            <div class="meta">
+              <div>Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
+              <!-- Added so JS can set it safely -->
+              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
+            </div>
           </section>
 
           <aside class="panel qr">
             <img id="qrImg" src="qr.png" alt="Payment QR Code" />
             <div class="note" style="text-align:center;margin-top:8px">If the QR doesn't load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
-
-            <!-- Stripe Alternative Payment -->
-            <div style="margin-top:14px; display:grid; gap:8px;">
-              <a class="btn primary"
-                 href="https://buy.stripe.com/cNi28rfiWdkR1fn7hj57W0v"
-                 target="_blank" rel="noopener">
-                Alternative Payment via Card / GrabPay
-              </a>
-              <div class="note" style="text-align:center">Powered by Stripe • Secure checkout</div>
-            </div>
           </aside>
         </div>
       </div>
 
       <footer>
-        <div>Need help? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">@kokombeee</a>.</div>
-        <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. © <span id="year"></span></div>
+        <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
+        <div style="margin-top:6px">
+          <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap e-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
+          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. © <span id="year"></span></div>
+        </div>
       </footer>
     </div>
   </div>
 
   <script>
+    // ===== CONFIG (edit these values) =====
     const TELEGRAM_USERNAME = 'kokombeee';
-    const PRICE_MYR = '10';
     const QR_SRC = 'qr.png';
+    const BOOKS = [
+      { category: 'e-books', value: 'antarakestetiadangodaan', title: 'Antara Kesetiaan dan Godaan', price: 10.00 },
+      { category: 'e-books', value: 'menantuadalahnikmat', title: 'Menantu Adalah Nikmat', price: 10.00 },
+      { category: 'e-books', value: 'oranggajiitukekasihgelapku', title: 'Orang Gaji Itu, Kekasih Gelapku', price: 10.00 },
+      { category: 'e-books', value: 'perjalananhidupku', title: 'Perjalanan Hidupku', price: 10.00 },
+      { category: 'e-books', value: 'dilemahati', title: 'Dilema Hati', price: 5.00 },
+      { category: 'e-books', value: 'dendamdanmaruah', title: 'Dendam dan Maruah', price: 8.00 },
+      { category: 'e-books', value: 'dosadisebalikniqab', title: 'Dosa Disebalik Niqab', price: 10.00 },
+      { category: 'e-books', value: 'cikgukuscandalku', title: 'Cikguku Scandalku', price: 10.00 },
+      { category: 'e-books', value: 'tercurangtanpaniat', title: 'Tercurang Tanpa Niat', price: 8.00 },
+      { category: 'e-books', value: 'ustazahnurreloaded', title: 'Ustazah Nur : Reloaded', price: 10.00 },
+      { category: 'e-books', value: 'menantuadalahnikmatjilid2', title: 'Menantu Adalah Nikmat : Jilid 2', price: 10.00 },
+      { category: 'e-komik', value: '10pagi', title: '10 Pagi', price: 5.00 },
+      { category: 'e-komik', value: 'situkangurut', title: 'Si Tukang Urut', price: 5.00 },
+      { category: 'e-komik', value: 'surti', title: 'Surti', price: 5.00 },
+      { category: 'e-komik', value: 'isteriyangbaik', title: 'Isteri Yang Baik', price: 5.00 },
+      { category: 'e-komik', value: 'sewarumah', title: 'Sewa Rumah', price: 5.00 },
+      { category: 'e-komik', value: 'kawanbaikana', title: 'Kawan Baik Anak', price: 5.00 },
+      { category: 'e-komik', value: 'kontraktidakbermoral', title: 'Kontrak Tidak Bermoral', price: 5.00 },
+      { category: 'e-komik', value: 'diaripengembaraan', title: 'Diari Pengembaraan', price: 5.00 },
+      { category: 'e-komik', value: 'diariseorangwanita', title: 'Diari Seorang Wanita', price: 5.00 },
+      { category: 'e-komik', value: 'betweenaffectionandintimacy', title: 'Between Affection and Intimacy', price: 5.00 },
+      { category: 'e-komik', value: 'valentine', title: 'Valentine', price: 5.00 },
+      { category: 'e-komik', value: 'younglove', title: 'Young Love', price: 5.00 }
+    ];
+    // =======================================
 
-    document.getElementById('price').textContent = PRICE_MYR;
-    document.getElementById('qrImg').src = QR_SRC;
-    document.getElementById('qrOpen').addEventListener('click', (e)=>{
-      e.preventDefault(); window.open(QR_SRC, '_blank', 'noopener');
+    // Apply config to UI (guard each getElementById)
+    const tgLinkEl = document.getElementById('tgLink');
+    if (tgLinkEl) tgLinkEl.href = `https://t.me/${TELEGRAM_USERNAME}`;
+
+    const tgAtEl = document.getElementById('tgAt');
+    if (tgAtEl) tgAtEl.textContent = `@${TELEGRAM_USERNAME}`;
+
+    const qrImgEl = document.getElementById('qrImg');
+    if (qrImgEl) qrImgEl.src = QR_SRC;
+
+    const qrOpenEl = document.getElementById('qrOpen');
+    if (qrOpenEl) qrOpenEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.open(QR_SRC, '_blank', 'noopener');
     });
 
-    function composeMessage(){
+    const bookContainer = document.getElementById('book-selection-container');
+    const totalPriceElement = document.getElementById('totalPrice');
+    const discountInfo = document.getElementById('discountInfo');
+
+    function createBookSelect() {
+      const select = document.createElement('select');
+      select.required = true;
+      select.style.marginTop = '10px';
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Pilih e-books anda';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      select.appendChild(defaultOption);
+
+      const ebooksGroup = document.createElement('optgroup');
+      ebooksGroup.label = 'e-books';
+      const ekomikGroup = document.createElement('optgroup');
+      ekomikGroup.label = 'E-komik';
+
+      BOOKS.forEach(book => {
+        const option = document.createElement('option');
+        option.value = book.value;
+        option.textContent = `${book.title} (RM ${book.price.toFixed(2)})`;
+        option.setAttribute('data-price', book.price);
+        if (book.category === 'e-books') {
+          ebooksGroup.appendChild(option);
+        } else if (book.category === 'e-komik') {
+          ekomikGroup.appendChild(option);
+        }
+      });
+
+      select.appendChild(ebooksGroup);
+      select.appendChild(ekomikGroup);
+      return select;
+    }
+
+    function calculateTotal() {
+      const allSelects = bookContainer.querySelectorAll('select');
+      let total = 0;
+      let bookCount = 0;
+      allSelects.forEach(select => {
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && selectedOption.value) {
+          total += parseFloat(selectedOption.getAttribute('data-price'));
+          bookCount++;
+        }
+      });
+
+      let finalPrice = total;
+      if (discountInfo) discountInfo.innerHTML = '';
+
+      if (bookCount >= 3) {
+        const discount = total * 0.05;
+        finalPrice = total - discount;
+        if (discountInfo) discountInfo.innerHTML =
+          `<span style="color:var(--ok);font-size:12px;">Diskaun 5% (RM ${discount.toFixed(2)}) diterima.</span>`;
+      }
+
+      if (totalPriceElement) totalPriceElement.textContent = finalPrice.toFixed(2);
+    }
+
+    const addBookBtn = document.getElementById('addBookBtn');
+    if (addBookBtn) {
+      addBookBtn.addEventListener('click', () => {
+        const newSelect = createBookSelect();
+        bookContainer.appendChild(newSelect);
+        newSelect.addEventListener('change', calculateTotal);
+        calculateTotal();
+      });
+    }
+
+    // Add the first book field on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const initialSelect = createBookSelect();
+      bookContainer.appendChild(initialSelect);
+      initialSelect.addEventListener('change', calculateTotal);
+    });
+
+    function composeMessage() {
       const email = (document.getElementById('email')?.value || '').trim();
+      const allSelects = bookContainer.querySelectorAll('select');
+      const selectedBooks = [];
+      allSelects.forEach(select => {
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && selectedOption.value) {
+          const title = selectedOption.textContent.split(' (RM')[0];
+          const price = parseFloat(selectedOption.getAttribute('data-price'));
+          selectedBooks.push({ title, price });
+        }
+      });
+
+      const total = selectedBooks.reduce((sum, book) => sum + book.price, 0);
+      let finalPrice = total;
+      if (selectedBooks.length >= 3) {
+        finalPrice = total * 0.95;
+      }
+
       const lines = [
-        'Hi! I just paid for the e-book.',
-        `Amount: RM ${PRICE_MYR}`,
-        email ? `Buyer Email: ${email}` : '(email not provided)'
+        'Hi! I just paid for some ebooks.',
+        'Here are the details:',
+        ''
       ];
+      selectedBooks.forEach(book => {
+        lines.push(`- ${book.title}: RM ${book.price.toFixed(2)}`);
+      });
+      lines.push('');
+      if (selectedBooks.length >= 3) {
+        lines.push('Diskaun: 5%');
+        lines.push(`Jumlah Asal: RM ${total.toFixed(2)}`);
+      }
+      lines.push(`Jumlah Bayaran: RM ${finalPrice.toFixed(2)}`);
+      if (email) lines.push(`Email: ${email}`);
+
       return encodeURIComponent(lines.join('\n'));
     }
 
-    document.getElementById('copyHandle').addEventListener('click', async()=>{
-      try{await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME); alert('Telegram handle copied!');}
-      catch{prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME)}
-    });
+    // Copy Telegram handle
+    const copyHandleBtn = document.getElementById('copyHandle');
+    if (copyHandleBtn) {
+      copyHandleBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME);
+          alert('Telegram handle copied to clipboard.');
+        } catch {
+          prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME);
+        }
+      });
+    }
 
-    document.getElementById('tgLink').addEventListener('click', (e)=>{
-      const email = document.getElementById('email').value.trim();
-      if(!email){ e.preventDefault(); alert('Please enter your email before continuing.'); return; }
-      e.currentTarget.href = `https://t.me/${TELEGRAM_USERNAME}?text=${composeMessage()}`;
-    });
+    // Telegram button: open prefilled message
+    if (tgLinkEl) {
+      tgLinkEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        const msg = composeMessage();
+        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+      });
+    }
 
-    document.getElementById('paidBtn').addEventListener('click', ()=>{
-      const email = document.getElementById('email').value.trim();
-      if(!email){ alert('Please enter your email before continuing.'); return; }
-      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${composeMessage()}`, '_blank', 'noopener');
-    });
+    // Paid button UX
+    const paidBtn = document.getElementById('paidBtn');
+    if (paidBtn) {
+      paidBtn.addEventListener('click', () => {
+        const msg = composeMessage();
+        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+      });
+    }
 
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // Year
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
