@@ -1,0 +1,150 @@
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E‑book Purchase • QR Pay + Telegram</title>
+  <meta name="description" content="Pay via QR then message me on Telegram to receive the e‑book." />
+  <style>
+    :root{--bg:#0b0f14;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa;--ok:#34d399;--warn:#f59e0b;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:radial-gradient(1200px 600px at 100% -10%,#1f2937 0%,#0b0f14 60%);color:var(--text);}
+    .wrap{max-width:760px;margin:0 auto;padding:24px;}
+    .card{background:linear-gradient(180deg,#0f172a, #0b1020 50%, #0b0f14);border:1px solid #1f2937;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+    header{padding:22px 22px 10px;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:14px}
+    .logo{width:44px;height:44px;border-radius:12px;background:#0ea5e9;display:grid;place-items:center;font-weight:700}
+    .logo span{filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:14px;margin-top:2px}
+    .body{padding:22px;display:grid;gap:20px}
+    .grid{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:720px){.grid{grid-template-columns:1.2fr .8fr}}
+    .panel{background:rgba(255,255,255,.02);border:1px solid #1f2937;border-radius:16px;padding:16px}
+    .price{font-size:30px;font-weight:800;letter-spacing:.3px}
+    .note{color:var(--muted);font-size:14px}
+    input[type="email"], input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #0b1224;
+      color: var(--text);
+      margin-top: 10px;
+    }
+    .steps{display:grid;gap:10px;margin:10px 0 0}
+    .step{display:flex;gap:10px;align-items:flex-start}
+    .badge{font-variant-numeric:tabular-nums;min-width:26px;height:26px;border-radius:8px;background:#111827;border:1px solid #1f2937;display:grid;place-items:center;color:var(--accent);font-weight:700}
+    .qr{display:grid;place-items:center;padding:10px}
+    .qr img{width:100%;max-width:300px;border-radius:12px;border:1px solid #1f2937;background:#fff}
+    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    .btn{appearance:none;border:1px solid #1f2937;background:#0b1224;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .btn.primary{background:linear-gradient(180deg,#2563eb,#1d4ed8);border-color:#1e40af}
+    .btn.success{background:linear-gradient(180deg,#10b981,#059669);border-color:#047857}
+    .meta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:13px}
+    footer{padding:14px 22px 22px;color:var(--muted);font-size:12px}
+    code{background:#0b1224;padding:2px 6px;border-radius:6px;border:1px solid #1f2937}
+    a{color:var(--accent);text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo"><span>📚</span></div>
+        <div>
+          <h1 id="title">Pembayaran Online: <span data-editable="true">ebooks</span></h1>
+          <div class="sub">Instant delivery via Google Drive after payment confirmation (ePub @ PDF)</div>
+        </div>
+      </header>
+
+      <div class="body">
+        <div class="grid">
+          <section class="panel">
+            <div class="price">RM <span id="price">10</span></div>
+            <p class="note">Please enter your book title and email address to receive the ebook.</p>
+            <input type="text" id="bookTitle" placeholder="Book Title" required />
+            <input type="email" id="email" placeholder="Your Email Address" required />
+            <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
+            <div class="steps">
+              <div class="step"><div class="badge">1</div><div>Open your banking app and choose <strong>QR Pay</strong>.</div></div>
+              <div class="step"><div class="badge">2</div><div>Scan the QR code on the right and pay the exact amount.</div></div>
+              <div class="step"><div class="badge">3</div><div>Click <strong>Message on Telegram</strong> and send your receipt. You’ll receive the ebooks shortly.</div></div>
+            </div>
+            <div class="btns">
+              <a id="tgLink" class="btn primary" href="https://t.me/kokombeee" target="_blank" rel="noopener">Message on Telegram</a>
+              <button class="btn" id="copyHandle" type="button">Copy Telegram @</button>
+              <button class="btn success" id="paidBtn" type="button">I’ve Paid</button>
+            </div>
+            <div class="meta">
+              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
+            </div>
+          </section>
+
+          <aside class="panel qr">
+            <img id="qrImg" src="qr.png" alt="Payment QR Code" />
+            <div class="note" style="text-align:center;margin-top:8px">If the QR doesn’t load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
+          </aside>
+        </div>
+      </div>
+
+      <footer>
+        <div>Need help? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">@kokombeee</a>.</div>
+        <div style="margin-top:6px">By paying you agree to the no‑refund policy for digital goods. © <span id="year"></span></div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIG (edit these 2 values) =====
+    const TELEGRAM_USERNAME = 'kokombeee';        // your Telegram handle
+    const PRICE_MYR = '10';                       // price in RM
+    const QR_SRC = 'qr.png';                      // file path or https:// URL
+    // =======================================
+
+    // Apply config to UI
+    document.getElementById('tgLink').href = `https://t.me/${TELEGRAM_USERNAME}`;
+    document.getElementById('tgAt').textContent = `@${TELEGRAM_USERNAME}`;
+    document.getElementById('price').textContent = PRICE_MYR;
+    document.getElementById('qrImg').src = QR_SRC;
+    document.getElementById('qrOpen').addEventListener('click', (e)=>{
+      e.preventDefault(); window.open(QR_SRC, '_blank', 'noopener');
+    });
+
+    function composeMessage(){
+      const bookTitle = document.getElementById('bookTitle').value;
+      const email = document.getElementById('email').value;
+      const lines = [
+        'Hi! I just paid for the e‑book.',
+        `Book Title: ${bookTitle}`,
+        `Amount: RM ${PRICE_MYR}`,
+        `Email: ${email}`
+      ];
+      return encodeURIComponent(lines.join('\n'));
+    }
+
+    // Copy Telegram handle
+    document.getElementById('copyHandle').addEventListener('click', async()=>{
+      try{await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME); alert('Telegram handle copied!');}
+      catch{prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME)}
+    });
+
+    // Telegram button: open prefilled message (may not always work on user DMs)
+    document.getElementById('tgLink').addEventListener('click', (e)=>{
+      const msg = composeMessage();
+      e.currentTarget.href = `https://t.me/${TELEGRAM_USERNAME}?text=${msg}`;
+    });
+
+    // Paid button UX
+    document.getElementById('paidBtn').addEventListener('click', ()=>{
+      const msg = composeMessage();
+      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+    });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+```
