@@ -63,12 +63,13 @@
         <div class="grid">
           <section class="panel">
             <div class="total-price">Total: RM <span id="totalPrice">0.00</span></div>
+            <div id="discountInfo" style="margin-top: -5px; margin-bottom: 5px;"></div>
             <p class="note">Sila pilih tajuk ebooks dan masukkan email address untuk menerima link gdrive.</p>
             
             <div id="book-selection-container">
               <!-- Book selection fields will be added here dynamically -->
             </div>
-            <button id="addBookBtn" class="btn">Add another book</button>
+            <button id="addBookBtn" class="btn">+ tambah lagi e-books</button>
             
             <input type="email" id="email" placeholder="Your Email Address" required />
             <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
@@ -83,7 +84,7 @@
               <button class="btn success" id="paidBtn" type="button">I’ve Paid</button>
             </div>
             <div class="meta">
-              <div>Telegram: <code id="tgAt">@kokombeee</code></div>
+              <div>Pembelian 3 e-books dan lebih, dapat 5% diskaun.</div>
             </div>
           </section>
 
@@ -98,7 +99,7 @@
       <footer>
         <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
         <div style="margin-top:6px">
-          <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap E-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
+          <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap e-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
           <div style="margin-top:6px">By paying you agree to the no‑refund policy for digital goods. © <span id="year"></span></div>
         </div>
       </footer>
@@ -147,6 +148,7 @@
 
     const bookContainer = document.getElementById('book-selection-container');
     const totalPriceElement = document.getElementById('totalPrice');
+    const discountInfo = document.getElementById('discountInfo');
 
     function createBookSelect() {
       const select = document.createElement('select');
@@ -155,13 +157,13 @@
       
       const defaultOption = document.createElement('option');
       defaultOption.value = '';
-      defaultOption.textContent = 'Select an Ebook';
+      defaultOption.textContent = 'Pilih e-books anda';
       defaultOption.disabled = true;
       defaultOption.selected = true;
       select.appendChild(defaultOption);
 
       const ebooksGroup = document.createElement('optgroup');
-      ebooksGroup.label = 'E-books';
+      ebooksGroup.label = 'e-books';
       const ekomikGroup = document.createElement('optgroup');
       ekomikGroup.label = 'E-komik';
       
@@ -186,13 +188,25 @@
     function calculateTotal() {
       const allSelects = bookContainer.querySelectorAll('select');
       let total = 0;
+      let bookCount = 0;
       allSelects.forEach(select => {
         const selectedOption = select.selectedOptions[0];
         if (selectedOption && selectedOption.value) {
           total += parseFloat(selectedOption.getAttribute('data-price'));
+          bookCount++;
         }
       });
-      totalPriceElement.textContent = total.toFixed(2);
+
+      let finalPrice = total;
+      discountInfo.innerHTML = ''; // Clear previous message
+
+      if (bookCount >= 3) {
+        const discount = total * 0.05;
+        finalPrice = total - discount;
+        discountInfo.innerHTML = `<span style="color:var(--ok); font-size:12px;">Diskaun 5% (${discount.toFixed(2)}) diterima.</span>`;
+      }
+      
+      totalPriceElement.textContent = finalPrice.toFixed(2);
     }
 
     document.getElementById('addBookBtn').addEventListener('click', () => {
@@ -221,6 +235,12 @@
           selectedBooks.push({ title, price });
         }
       });
+
+      const total = selectedBooks.reduce((sum, book) => sum + book.price, 0);
+      let finalPrice = total;
+      if (selectedBooks.length >= 3) {
+        finalPrice = total * 0.95;
+      }
       
       let lines = [
         'Hi! I just paid for some ebooks.',
@@ -231,7 +251,11 @@
         lines.push(`- ${book.title}: RM ${book.price.toFixed(2)}`);
       });
       lines.push('');
-      lines.push(`Total Amount: RM ${totalPriceElement.textContent}`);
+      if (selectedBooks.length >= 3) {
+        lines.push(`Diskaun: 5%`);
+        lines.push(`Jumlah Asal: RM ${total.toFixed(2)}`);
+      }
+      lines.push(`Jumlah Bayaran: RM ${finalPrice.toFixed(2)}`);
       lines.push(`Email: ${email}`);
 
       return encodeURIComponent(lines.join('\n'));
