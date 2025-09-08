@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,7 +13,7 @@
     .card{background:linear-gradient(180deg,#0f172a, #0b1020 50%, #0b0f14);border:1px solid #1f2937;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
     header{padding:22px 22px 10px;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:14px}
     .logo{width:44px;height:44px;border-radius:12px;background:#0ea5e9;display:grid;place-items:center;font-weight:700}
-    .logo span{filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));}
+    .logo span{filter:drop-shadow(0 2px 6px(0,0,0,.4));}
     h1{font-size:20px;margin:0}
     .sub{color:var(--muted);font-size:14px;margin-top:2px}
     .body{padding:22px;display:grid;gap:20px}
@@ -23,7 +22,7 @@
     .panel{background:rgba(255,255,255,.02);border:1px solid #1f2937;border-radius:16px;padding:16px}
     .price{font-size:30px;font-weight:800;letter-spacing:.3px}
     .note{color:var(--muted);font-size:14px}
-    input[type="email"], input[type="text"] {
+    input[type="email"], select {
       width: 100%;
       padding: 10px 14px;
       border-radius: 12px;
@@ -32,6 +31,7 @@
       color: var(--text);
       margin-top: 10px;
     }
+    .total-price{font-size:20px;font-weight:800;margin-top:10px}
     .steps{display:grid;gap:10px;margin:10px 0 0}
     .step{display:flex;gap:10px;align-items:flex-start}
     .badge{font-variant-numeric:tabular-nums;min-width:26px;height:26px;border-radius:8px;background:#111827;border:1px solid #1f2937;display:grid;place-items:center;color:var(--accent);font-weight:700}
@@ -54,7 +54,7 @@
       <header>
         <div class="logo"><span>📚</span></div>
         <div>
-          <h1 id="title">Pembayaran Online: <span data-editable="true">ebooks</span></h1>
+          <h1 id="title">Pembayaran Online: <span data-editable="true">ebooks & e-komik</span></h1>
           <div class="sub">Instant delivery via Google Drive after payment confirmation (ePub @ PDF)</div>
         </div>
       </header>
@@ -62,11 +62,16 @@
       <div class="body">
         <div class="grid">
           <section class="panel">
-            <div class="price">RM <span id="price">10</span></div>
-            <p class="note">Silakan masukkan tajuk ebooks dan alamat email anda untuk menerima ebook.</p>
-            <input type="text" id="bookTitle" placeholder="Tajuk Ebook" required />
-            <input type="email" id="email" placeholder="Email Address Anda" required />
-            <p class="note">Scan the QR untuk melakukan pembayaran. Kemudian kirimkan resit di Telegram chat dengan bukti pembayaran anda.</p>
+            <div class="total-price">Total: RM <span id="totalPrice">0.00</span></div>
+            <p class="note">Sila pilih tajuk ebooks dan masukkan email address untuk menerima link gdrive.</p>
+            
+            <div id="book-selection-container">
+              <!-- Book selection fields will be added here dynamically -->
+            </div>
+            <button id="addBookBtn" class="btn">Add another book</button>
+            
+            <input type="email" id="email" placeholder="Your Email Address" required />
+            <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
             <div class="steps">
               <div class="step"><div class="badge">1</div><div>Open your banking app and choose <strong>QR Pay</strong>.</div></div>
               <div class="step"><div class="badge">2</div><div>Scan the QR code on the right and pay the exact amount.</div></div>
@@ -83,61 +88,176 @@
           </section>
 
           <aside class="panel qr">
+            <!-- Replace src with your actual QR image URL or filename (qr.png) -->
             <img id="qrImg" src="qr.png" alt="Payment QR Code" />
-            <div class="note" style="text-align:center;margin-top:8px">If the QR doesn’t load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
+            <div class="note" style="text-align:center;margin-top:8px">If the QR doesn't load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
           </aside>
         </div>
       </div>
 
       <footer>
-        <div>Need help? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">@kokombeee</a>.</div>
-        <div style="margin-top:6px">By paying you agree to the no‑refund policy for digital goods. © <span id="year"></span></div>
+        <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
+        <div style="margin-top:6px">
+          <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap E-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
+          <div style="margin-top:6px">By paying you agree to the no‑refund policy for digital goods. © <span id="year"></span></div>
+        </div>
       </footer>
     </div>
   </div>
 
   <script>
-    // ===== CONFIG (edit these 2 values) =====
-    const TELEGRAM_USERNAME = 'kokombeee';        // your Telegram handle
-    const PRICE_MYR = '10';                       // price in RM
-    const QR_SRC = 'qr.png';                      // file path or https:// URL
+    // ===== CONFIG (edit these values) =====
+    const TELEGRAM_USERNAME = 'kokombeee';
+    const QR_SRC = 'qr.png';
+    const BOOKS = [
+      { category: 'e-books', value: 'antarakestetiadangodaan', title: 'Antara Kesetiaan dan Godaan', price: 10.00 },
+      { category: 'e-books', value: 'menantuadalahnikmat', title: 'Menantu Adalah Nikmat', price: 10.00 },
+      { category: 'e-books', value: 'oranggajiitukekasihgelapku', title: 'Orang Gaji Itu, Kekasih Gelapku', price: 10.00 },
+      { category: 'e-books', value: 'perjalananhidupku', title: 'Perjalanan Hidupku', price: 10.00 },
+      { category: 'e-books', value: 'dilemahati', title: 'Dilema Hati', price: 5.00 },
+      { category: 'e-books', value: 'dendamdanmaruah', title: 'Dendam dan Maruah', price: 8.00 },
+      { category: 'e-books', value: 'dosadisebalikniqab', title: 'Dosa Disebalik Niqab', price: 10.00 },
+      { category: 'e-books', value: 'cikgukuscandalku', title: 'Cikguku Scandalku', price: 10.00 },
+      { category: 'e-books', value: 'tercurangtanpaniat', title: 'Tercurang Tanpa Niat', price: 8.00 },
+      { category: 'e-books', value: 'ustazahnurreloaded', title: 'Ustazah Nur : Reloaded', price: 10.00 },
+      { category: 'e-books', value: 'menantuadalahnikmatjilid2', title: 'Menantu Adalah Nikmat : Jilid 2', price: 10.00 },
+      { category: 'e-komik', value: '10pagi', title: '10 Pagi', price: 5.00 },
+      { category: 'e-komik', value: 'situkangurut', title: 'Si Tukang Urut', price: 5.00 },
+      { category: 'e-komik', value: 'surti', title: 'Surti', price: 5.00 },
+      { category: 'e-komik', value: 'isteriyangbaik', title: 'Isteri Yang Baik', price: 5.00 },
+      { category: 'e-komik', value: 'sewarumah', title: 'Sewa Rumah', price: 5.00 },
+      { category: 'e-komik', value: 'kawanbaikana', title: 'Kawan Baik Anak', price: 5.00 },
+      { category: 'e-komik', value: 'kontraktidakbermoral', title: 'Kontrak Tidak Bermoral', price: 5.00 },
+      { category: 'e-komik', value: 'diaripengembaraan', title: 'Diari Pengembaraan', price: 5.00 },
+      { category: 'e-komik', value: 'diariseorangwanita', title: 'Diari Seorang Wanita', price: 5.00 },
+      { category: 'e-komik', value: 'betweenaffectionandintimacy', title: 'Between Affection and Intimacy', price: 5.00 },
+      { category: 'e-komik', value: 'valentine', title: 'Valentine', price: 5.00 },
+      { category: 'e-komik', value: 'younglove', title: 'Young Love', price: 5.00 }
+    ];
     // =======================================
 
     // Apply config to UI
     document.getElementById('tgLink').href = `https://t.me/${TELEGRAM_USERNAME}`;
     document.getElementById('tgAt').textContent = `@${TELEGRAM_USERNAME}`;
-    document.getElementById('price').textContent = PRICE_MYR;
     document.getElementById('qrImg').src = QR_SRC;
-    document.getElementById('qrOpen').addEventListener('click', (e)=>{
-      e.preventDefault(); window.open(QR_SRC, '_blank', 'noopener');
+    document.getElementById('qrOpen').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.open(QR_SRC, '_blank', 'noopener');
     });
 
-    function composeMessage(){
-      const bookTitle = document.getElementById('bookTitle').value;
+    const bookContainer = document.getElementById('book-selection-container');
+    const totalPriceElement = document.getElementById('totalPrice');
+
+    function createBookSelect() {
+      const select = document.createElement('select');
+      select.required = true;
+      select.style.marginTop = '10px';
+      
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select an Ebook';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      select.appendChild(defaultOption);
+
+      const ebooksGroup = document.createElement('optgroup');
+      ebooksGroup.label = 'E-books';
+      const ekomikGroup = document.createElement('optgroup');
+      ekomikGroup.label = 'E-komik';
+      
+      BOOKS.forEach(book => {
+        const option = document.createElement('option');
+        option.value = book.value;
+        option.textContent = `${book.title} (RM ${book.price.toFixed(2)})`;
+        option.setAttribute('data-price', book.price);
+        if (book.category === 'e-books') {
+          ebooksGroup.appendChild(option);
+        } else if (book.category === 'e-komik') {
+          ekomikGroup.appendChild(option);
+        }
+      });
+      
+      select.appendChild(ebooksGroup);
+      select.appendChild(ekomikGroup);
+      
+      return select;
+    }
+
+    function calculateTotal() {
+      const allSelects = bookContainer.querySelectorAll('select');
+      let total = 0;
+      allSelects.forEach(select => {
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && selectedOption.value) {
+          total += parseFloat(selectedOption.getAttribute('data-price'));
+        }
+      });
+      totalPriceElement.textContent = total.toFixed(2);
+    }
+
+    document.getElementById('addBookBtn').addEventListener('click', () => {
+      const newSelect = createBookSelect();
+      bookContainer.appendChild(newSelect);
+      newSelect.addEventListener('change', calculateTotal);
+      calculateTotal();
+    });
+    
+    // Add the first book field on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const initialSelect = createBookSelect();
+      bookContainer.appendChild(initialSelect);
+      initialSelect.addEventListener('change', calculateTotal);
+    });
+
+    function composeMessage() {
       const email = document.getElementById('email').value;
-      const lines = [
-        'Hi! I just paid for the e‑book.',
-        `Book Title: ${bookTitle}`,
-        `Amount: RM ${PRICE_MYR}`,
-        `Email: ${email}`
+      const allSelects = bookContainer.querySelectorAll('select');
+      const selectedBooks = [];
+      allSelects.forEach(select => {
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && selectedOption.value) {
+          const title = selectedOption.textContent.split(' (RM')[0];
+          const price = parseFloat(selectedOption.getAttribute('data-price'));
+          selectedBooks.push({ title, price });
+        }
+      });
+      
+      let lines = [
+        'Hi! I just paid for some ebooks.',
+        'Here are the details:',
+        ''
       ];
+      selectedBooks.forEach(book => {
+        lines.push(`- ${book.title}: RM ${book.price.toFixed(2)}`);
+      });
+      lines.push('');
+      lines.push(`Total Amount: RM ${totalPriceElement.textContent}`);
+      lines.push(`Email: ${email}`);
+
       return encodeURIComponent(lines.join('\n'));
     }
 
     // Copy Telegram handle
-    document.getElementById('copyHandle').addEventListener('click', async()=>{
-      try{await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME); alert('Telegram handle copied!');}
-      catch{prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME)}
+    document.getElementById('copyHandle').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME);
+        // Replace alert() with a custom modal or message.
+        // For demonstration, a simple prompt is used here.
+        prompt('Telegram handle copied to clipboard. Paste it into your Telegram chat.', '@' + TELEGRAM_USERNAME);
+      } catch {
+        prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME);
+      }
     });
 
-    // Telegram button: open prefilled message (may not always work on user DMs)
-    document.getElementById('tgLink').addEventListener('click', (e)=>{
+    // Telegram button: open prefilled message
+    document.getElementById('tgLink').addEventListener('click', (e) => {
+      e.preventDefault();
       const msg = composeMessage();
-      e.currentTarget.href = `https://t.me/${TELEGRAM_USERNAME}?text=${msg}`;
+      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
     });
 
     // Paid button UX
-    document.getElementById('paidBtn').addEventListener('click', ()=>{
+    document.getElementById('paidBtn').addEventListener('click', () => {
       const msg = composeMessage();
       window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
     });
@@ -147,4 +267,3 @@
   </script>
 </body>
 </html>
-```
