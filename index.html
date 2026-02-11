@@ -45,6 +45,7 @@
     .btn.tng{background:linear-gradient(180deg,#0055ab,#003d7a);border-color:#003d7a}
     .btn img.icon{width:22px;height:22px;object-fit:contain;}
     .btn svg.icon-svg{width:18px;height:18px;fill:white;}
+    .btn.is-disabled, .btn:disabled {opacity:.5;pointer-events:none;cursor:not-allowed;filter:grayscale(.2);}
     .meta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:13px}
     footer{padding:14px 22px 22px;color:var(--muted);font-size:12px}
     code{background:#0b1224;padding:2px 6px;border-radius:6px;border:1px solid #1f2937}
@@ -55,7 +56,7 @@
   <div class="wrap">
     <div class="card">
       <header>
-        <div class="logo"><span>📚</span></div>
+        <div class="logo"><span>ðŸ“š</span></div>
         <div>
           <h1 id="title">Pembayaran Online: <span data-editable="true">ebooks & e-komik</span></h1>
           <div class="sub">Instant delivery via Google Drive after payment confirmation (ePub @ PDF)</div>
@@ -70,7 +71,7 @@
             <p class="note">Sila pilih tajuk ebooks dan masukkan gmail address untuk menerima link gdrive.</p>
 
             <div id="book-selection-container"></div>
-            <button id="addBookBtn" class="btn">+ tambah lagi e-books</button>
+            <button id="addBookBtn" class="btn" type="button">+ tambah lagi e-books</button>
 
             <input type="email" id="email" placeholder="Your Email Address" required />
             <p class="note">Scan the QR to pay. Then message me on Telegram with your payment receipt.</p>
@@ -82,9 +83,8 @@
             </div>
 
             <div class="btns">
-              <a id="tgLink" class="btn primary" href="https://t.me/kokombeee" target="_blank" rel="noopener">Message on Telegram</a>
-              <button class="btn" id="copyHandle" type="button">Copy Telegram @</button>
-              <button class="btn success" id="paidBtn" type="button">Hantar Resit Payment</button>
+              <a id="tgLink" class="btn primary is-disabled" href="https://t.me/kokombeee" target="_blank" rel="noopener" aria-disabled="true">Message on Telegram</a>
+              <button class="btn success" id="paidBtn" type="button" disabled>Hantar Resit Payment</button>
             </div>
 
             <div class="meta">
@@ -95,7 +95,7 @@
           <aside class="panel qr">
             <img id="qrImg" src="qr.png" alt="Payment QR Code" />
             <div class="note" style="text-align:center;margin-top:8px">If the QR doesn't load, <a href="#" id="qrOpen">open it</a> in a new tab.</div>
-            
+
             <div style="margin-top:14px; text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center;">
               <a class="btn tng"
                  href="https://payment.tngdigital.com.my/sc/bDLnx1yAeB"
@@ -104,7 +104,7 @@
                 <img class="icon" src="https://raw.githubusercontent.com/gnote2minix7/ebooks/refs/heads/main/TNGo.png" alt="TNG Icon">
                 Payment via T&Go
               </a>
-              
+
               <a class="btn success"
                  href="https://buy.stripe.com/cNi28rfiWdkR1fn7hj57W0v"
                  target="_blank" rel="noopener"
@@ -122,7 +122,7 @@
         <div>Perlukan bantuan? Message <a href="https://t.me/kokombeee" target="_blank" rel="noopener">Suzanna AR</a>.</div>
         <div style="margin-top:6px">
           <div><a href="https://gnote2minix7.blogspot.com/p/antara-kesetiaan-dan-godaan.html" target="_blank" rel="noopener">Senarai dan info lengkap e-books</a> | <a href="https://gnote2minix7.blogspot.com/p/komik-3d.html" target="_blank" rel="noopener">Senarai dan info lengkap E-komik</a></div>
-          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. © <span id="year"></span></div>
+          <div style="margin-top:6px">By paying you agree to the no-refund policy for digital goods. Â© <span id="year"></span></div>
         </div>
       </footer>
     </div>
@@ -162,20 +162,24 @@
     ];
 
     const tgLinkEl = document.getElementById('tgLink');
-    if (tgLinkEl) tgLinkEl.href = `https://t.me/${TELEGRAM_USERNAME}`;
-
     const qrImgEl = document.getElementById('qrImg');
-    if (qrImgEl) qrImgEl.src = QR_SRC;
-
     const qrOpenEl = document.getElementById('qrOpen');
-    if (qrOpenEl) qrOpenEl.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open(QR_SRC, '_blank', 'noopener');
-    });
-
     const bookContainer = document.getElementById('book-selection-container');
     const totalPriceElement = document.getElementById('totalPrice');
     const discountInfo = document.getElementById('discountInfo');
+    const addBookBtn = document.getElementById('addBookBtn');
+    const paidBtn = document.getElementById('paidBtn');
+    const emailInput = document.getElementById('email');
+
+    if (tgLinkEl) tgLinkEl.href = `https://t.me/${TELEGRAM_USERNAME}`;
+    if (qrImgEl) qrImgEl.src = QR_SRC;
+
+    if (qrOpenEl) {
+      qrOpenEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(QR_SRC, '_blank', 'noopener');
+      });
+    }
 
     function createBookSelect() {
       const select = document.createElement('select');
@@ -199,11 +203,8 @@
         option.value = book.value;
         option.textContent = `${book.title} (RM ${book.price.toFixed(2)})`;
         option.setAttribute('data-price', book.price);
-        if (book.category === 'e-books') {
-          ebooksGroup.appendChild(option);
-        } else if (book.category === 'e-komik') {
-          ekomikGroup.appendChild(option);
-        }
+        if (book.category === 'e-books') ebooksGroup.appendChild(option);
+        if (book.category === 'e-komik') ekomikGroup.appendChild(option);
       });
 
       select.appendChild(ebooksGroup);
@@ -211,49 +212,7 @@
       return select;
     }
 
-    function calculateTotal() {
-      const allSelects = bookContainer.querySelectorAll('select');
-      let total = 0;
-      let bookCount = 0;
-      allSelects.forEach(select => {
-        const selectedOption = select.selectedOptions[0];
-        if (selectedOption && selectedOption.value) {
-          total += parseFloat(selectedOption.getAttribute('data-price'));
-          bookCount++;
-        }
-      });
-
-      let finalPrice = total;
-      if (discountInfo) discountInfo.innerHTML = '';
-
-      if (bookCount >= 3) {
-        const discount = total * 0.05;
-        finalPrice = total - discount;
-        if (discountInfo) discountInfo.innerHTML =
-          `<span style="color:var(--ok);font-size:12px;">Diskaun 5% (RM ${discount.toFixed(2)}) diterima.</span>`;
-      }
-
-      if (totalPriceElement) totalPriceElement.textContent = finalPrice.toFixed(2);
-    }
-
-    const addBookBtn = document.getElementById('addBookBtn');
-    if (addBookBtn) {
-      addBookBtn.addEventListener('click', () => {
-        const newSelect = createBookSelect();
-        bookContainer.appendChild(newSelect);
-        newSelect.addEventListener('change', calculateTotal);
-        calculateTotal();
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const initialSelect = createBookSelect();
-      bookContainer.appendChild(initialSelect);
-      initialSelect.addEventListener('change', calculateTotal);
-    });
-
-    function composeMessage() {
-      const email = (document.getElementById('email')?.value || '').trim();
+    function getSelectedBooks() {
       const allSelects = bookContainer.querySelectorAll('select');
       const selectedBooks = [];
       allSelects.forEach(select => {
@@ -264,59 +223,129 @@
           selectedBooks.push({ title, price });
         }
       });
+      return selectedBooks;
+    }
+
+    function updateCTAState() {
+      const selectedBooks = getSelectedBooks();
+      const hasBook = selectedBooks.length > 0;
+      const hasValidEmail = !!emailInput && emailInput.value.trim() !== '' && emailInput.checkValidity();
+      const canProceed = hasBook && hasValidEmail;
+
+      if (paidBtn) paidBtn.disabled = !canProceed;
+
+      if (tgLinkEl) {
+        tgLinkEl.setAttribute('aria-disabled', canProceed ? 'false' : 'true');
+        tgLinkEl.classList.toggle('is-disabled', !canProceed);
+      }
+    }
+
+    function calculateTotal() {
+      const selectedBooks = getSelectedBooks();
+      const total = selectedBooks.reduce((sum, book) => sum + book.price, 0);
+
+      let finalPrice = total;
+      if (discountInfo) discountInfo.innerHTML = '';
+
+      if (selectedBooks.length >= 3) {
+        const discount = total * 0.05;
+        finalPrice = total - discount;
+        if (discountInfo) {
+          discountInfo.innerHTML = `<span style="color:var(--ok);font-size:12px;">Diskaun 5% (RM ${discount.toFixed(2)}) diterima.</span>`;
+        }
+      }
+
+      if (totalPriceElement) totalPriceElement.textContent = finalPrice.toFixed(2);
+      updateCTAState();
+    }
+
+    function validateCheckout(showAlert = true) {
+      const selectedBooks = getSelectedBooks();
+      if (selectedBooks.length === 0) {
+        if (showAlert) alert('Sila pilih sekurang-kurangnya 1 e-book/e-komik.');
+        return false;
+      }
+
+      const email = (emailInput?.value || '').trim();
+      if (!email) {
+        if (showAlert) alert('Sila masukkan email untuk menerima link Google Drive.');
+        return false;
+      }
+
+      if (emailInput && !emailInput.checkValidity()) {
+        if (showAlert) alert('Sila masukkan email yang sah.');
+        return false;
+      }
+
+      return true;
+    }
+
+    function composeMessage() {
+      const email = (emailInput?.value || '').trim();
+      const selectedBooks = getSelectedBooks();
 
       const total = selectedBooks.reduce((sum, book) => sum + book.price, 0);
-      let finalPrice = total;
-      if (selectedBooks.length >= 3) {
-        finalPrice = total * 0.95;
-      }
+      const finalPrice = selectedBooks.length >= 3 ? total * 0.95 : total;
 
       const lines = [
         'Hi! Saya dah buat pembayaran untuk ebooks.',
         'Details pembelian:',
         ''
       ];
+
       selectedBooks.forEach(book => {
         lines.push(`- ${book.title}: RM ${book.price.toFixed(2)}`);
       });
+
       lines.push('');
       if (selectedBooks.length >= 3) {
         lines.push('Diskaun: 5%');
         lines.push(`Jumlah Asal: RM ${total.toFixed(2)}`);
       }
+
       lines.push(`Jumlah Bayaran: RM ${finalPrice.toFixed(2)}`);
-      if (email) lines.push(`Email: ${email}`);
+      lines.push(`Email: ${email}`);
 
       return encodeURIComponent(lines.join('\n'));
     }
 
-    const copyHandleBtn = document.getElementById('copyHandle');
-    if (copyHandleBtn) {
-      copyHandleBtn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText('@' + TELEGRAM_USERNAME);
-          alert('Telegram handle copied to clipboard.');
-        } catch {
-          prompt('Copy this Telegram handle:', '@' + TELEGRAM_USERNAME);
-        }
+    function openTelegramWithOrder() {
+      if (!validateCheckout(true)) return;
+      const msg = composeMessage();
+      window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+    }
+
+    if (addBookBtn) {
+      addBookBtn.addEventListener('click', () => {
+        const newSelect = createBookSelect();
+        bookContainer.appendChild(newSelect);
+        newSelect.addEventListener('change', calculateTotal);
+        calculateTotal();
       });
+    }
+
+    if (emailInput) {
+      emailInput.addEventListener('input', updateCTAState);
+      emailInput.addEventListener('blur', updateCTAState);
     }
 
     if (tgLinkEl) {
       tgLinkEl.addEventListener('click', (e) => {
         e.preventDefault();
-        const msg = composeMessage();
-        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
+        openTelegramWithOrder();
       });
     }
 
-    const paidBtn = document.getElementById('paidBtn');
     if (paidBtn) {
-      paidBtn.addEventListener('click', () => {
-        const msg = composeMessage();
-        window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${msg}`, '_blank', 'noopener');
-      });
+      paidBtn.addEventListener('click', openTelegramWithOrder);
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const initialSelect = createBookSelect();
+      bookContainer.appendChild(initialSelect);
+      initialSelect.addEventListener('change', calculateTotal);
+      calculateTotal();
+    });
 
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
